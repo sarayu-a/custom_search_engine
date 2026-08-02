@@ -2,12 +2,14 @@ from crawler.downloader import download_page
 from crawler.parser import parse_html
 from crawler.queue import URLQueue
 from crawler.storage import save_page
+from crawler.filters import is_valid_url, is_same_domain
 
 
 def main():
-    queue = URLQueue()
+    start_url = "https://example.com"
 
-    queue.add_url("https://example.com")
+    queue = URLQueue()
+    queue.add_url(start_url)
 
     page_number = 1
 
@@ -27,11 +29,13 @@ def main():
             print("Title:", page["title"])
 
             for link in page["links"]:
-                queue.add_url(link)
+
+                if is_valid_url(link) and is_same_domain(start_url, link):
+                    queue.add_url(link)
 
             page_number += 1
 
-            if page_number > 5:
+            if page_number > 10:
                 break
 
         except Exception as e:
