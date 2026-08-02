@@ -1,7 +1,6 @@
 from indexer.index import InvertedIndex
 from indexer.tokenizer import tokenize
 
-
 index = InvertedIndex()
 
 
@@ -16,4 +15,14 @@ def search(query):
     if not words:
         return set()
 
-    return index.search(words[0])
+    results = None
+
+    for word in words:
+        docs = index.search(word)
+
+        if results is None:
+            results = docs
+        else:
+            results = results.intersection(docs)
+
+    return results if results else set()

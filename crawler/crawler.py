@@ -3,6 +3,7 @@ from crawler.parser import parse_html
 from crawler.queue import URLQueue
 from crawler.storage import save_page
 from crawler.filters import is_valid_url, is_same_domain
+from indexer.search import add_page
 
 
 def main():
@@ -25,6 +26,9 @@ def main():
             save_page(f"page_{page_number}.html", html)
 
             page = parse_html(html, url)
+
+            text = " ".join(page["paragraphs"])
+            add_page(f"page_{page_number}", text)
 
             print("Title:", page["title"])
 
