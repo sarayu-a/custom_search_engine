@@ -1,7 +1,8 @@
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 
-def parse_html(html):
+def parse_html(html, base_url):
     soup = BeautifulSoup(html, "html.parser")
 
     title = soup.title.string if soup.title else "No Title"
@@ -14,8 +15,9 @@ def parse_html(html):
 
     for link in soup.find_all("a"):
         href = link.get("href")
+
         if href:
-            links.append(href)
+            links.append(urljoin(base_url, href))
 
     return {
         "title": title,

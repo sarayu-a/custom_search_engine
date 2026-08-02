@@ -1,28 +1,41 @@
 from crawler.downloader import download_page
 from crawler.parser import parse_html
+from crawler.queue import URLQueue
+from crawler.storage import save_page
 
 
 def main():
-    url = "https://example.com"
+    queue = URLQueue()
 
-    html = download_page(url)
+    queue.add_url("https://example.com")
 
-    page = parse_html(html)
+    page_number = 1
 
-    print("\nTitle:")
-    print(page["title"])
+    while queue.has_urls():
 
-    print("\nHeadings:")
-    for heading in page["headings"]:
-        print("-", heading)
+        url = queue.get_url()
 
-    print("\nParagraphs:")
-    for paragraph in page["paragraphs"]:
-        print("-", paragraph)
+        print(f"Crawling: {url}")
 
-    print("\nLinks:")
-    for link in page["links"]:
-        print("-", link)
+        try:
+            html = download_page(url)
+
+            save_page(f"page_{page_number}.html", html)
+
+            page = parse_html(html, url)
+
+            print("Title:", page["title"])
+
+            for link in page["links"]:
+                queue.add_url(link)
+
+            page_number += 1
+
+            if page_number > 5:
+                break
+
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":
