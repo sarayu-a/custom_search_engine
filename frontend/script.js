@@ -1,19 +1,34 @@
-async function search() {
+const API_URL = "http://127.0.0.1:8000";
 
-    const query = document.getElementById("query").value;
+
+async function search() {
+    const query = document.getElementById("query").value.trim();
+
+    if (!query) {
+        return;
+    }
 
     const response = await fetch(
-        "http://127.0.0.1:8000/search?q=" + encodeURIComponent(query)
+        `${API_URL}/search?q=${encodeURIComponent(query)}`
     );
 
     const data = await response.json();
 
+    displayResults(data.results);
+}
+
+
+function displayResults(results) {
     const list = document.getElementById("results");
 
     list.innerHTML = "";
 
-    data.results.forEach(result => {
+    if (results.length === 0) {
+        list.innerHTML = "<li>No results found.</li>";
+        return;
+    }
 
+    for (const result of results) {
         const li = document.createElement("li");
 
         li.innerHTML = `
@@ -25,7 +40,5 @@ async function search() {
         `;
 
         list.appendChild(li);
-
-    });
-
+    }
 }
