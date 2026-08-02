@@ -3,17 +3,25 @@ from indexer.tokenizer import tokenize
 
 index = InvertedIndex()
 
+documents = {}
 
-def add_page(document_id, text):
+
+def add_page(document_id, text, title="", url=""):
     words = tokenize(text)
     index.add_document(document_id, words)
+
+    documents[document_id] = {
+        "title": title,
+        "url": url,
+        "text": text
+    }
 
 
 def search(query):
     words = tokenize(query)
 
     if not words:
-        return set()
+        return []
 
     results = None
 
@@ -25,4 +33,16 @@ def search(query):
         else:
             results = results.intersection(docs)
 
-    return results if results else set()
+    if not results:
+        return []
+
+    output = []
+
+    for doc in results:
+        output.append({
+            "id": doc,
+            "title": documents[doc]["title"],
+            "url": documents[doc]["url"]
+        })
+
+    return output

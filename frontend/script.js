@@ -16,15 +16,13 @@ async function search() {
 
         const li = document.createElement("li");
 
-        const a = document.createElement("a");
-
-        a.href = "#";
-
-        a.textContent = result;
-
-        a.target = "_blank";
-
-        li.appendChild(a);
+        li.innerHTML = `
+            <a href="${result.url}" target="_blank">
+                ${result.title}
+            </a>
+            <br>
+            <small>${result.url}</small>
+        `;
 
         list.appendChild(li);
 

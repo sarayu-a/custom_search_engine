@@ -1,49 +1,62 @@
 from crawler.downloader import download_page
+from crawler.filters import is_same_domain, is_valid_url
 from crawler.parser import parse_html
 from crawler.queue import URLQueue
 from crawler.storage import save_page
-from crawler.filters import is_valid_url, is_same_domain
 from indexer.search import add_page
 
 
-def main():
-    start_url = "https://example.com"
+MAX_PAGES = 10
 
+
+def crawl(start_url):
     queue = URLQueue()
     queue.add_url(start_url)
 
     page_number = 1
 
-    while queue.has_urls():
+    while queue.has_urls() and page_number <= MAX_PAGES:
 
-        url = queue.get_url()
+        current_url = queue.get_url()
 
-        print(f"Crawling: {url}")
+        print(f"Crawling: {current_url}")
 
         try:
-            html = download_page(url)
+            html = download_page(current_url)
 
             save_page(f"page_{page_number}.html", html)
 
-            page = parse_html(html, url)
+            page = parse_html(html, current_url)
 
-            text = " ".join(page["paragraphs"])
-            add_page(f"page_{page_number}", text)
+            text = page["title"] + " " + " ".join(page["paragraphs"])
 
-            print("Title:", page["title"])
+            add_page(
+                f"page_{page_number}",
+                text,
+                page["title"],
+                current_url
+            )
+
+            print(f"Title: {page['title']}")
 
             for link in page["links"]:
 
-                if is_valid_url(link) and is_same_domain(start_url, link):
-                    queue.add_url(link)
+                if not is_valid_url(link):
+                    continue
+
+                if not is_same_domain(start_url, link):
+                    continue
+
+                queue.add_url(link)
 
             page_number += 1
 
-            if page_number > 10:
-                break
+        except Exception as error:
+            print(f"Error: {error}")
 
-        except Exception as e:
-            print(e)
+
+def main():
+    crawl("https://example.com")
 
 
 if __name__ == "__main__":

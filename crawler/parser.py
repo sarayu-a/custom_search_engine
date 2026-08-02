@@ -5,12 +5,40 @@ from urllib.parse import urljoin
 def parse_html(html, base_url):
     soup = BeautifulSoup(html, "html.parser")
 
-    title = soup.title.string if soup.title else "No Title"
+    title = get_title(soup)
+    headings = get_headings(soup)
+    paragraphs = get_paragraphs(soup)
+    links = get_links(soup, base_url)
 
-    headings = [heading.get_text(strip=True) for heading in soup.find_all("h1")]
+    return {
+        "title": title,
+        "headings": headings,
+        "paragraphs": paragraphs,
+        "links": links,
+    }
 
-    paragraphs = [paragraph.get_text(strip=True) for paragraph in soup.find_all("p")]
 
+def get_title(soup):
+    if soup.title and soup.title.string:
+        return soup.title.string.strip()
+    return "No Title"
+
+
+def get_headings(soup):
+    return [
+        heading.get_text(strip=True)
+        for heading in soup.find_all("h1")
+    ]
+
+
+def get_paragraphs(soup):
+    return [
+        paragraph.get_text(strip=True)
+        for paragraph in soup.find_all("p")
+    ]
+
+
+def get_links(soup, base_url):
     links = []
 
     for link in soup.find_all("a"):
@@ -19,9 +47,4 @@ def parse_html(html, base_url):
         if href:
             links.append(urljoin(base_url, href))
 
-    return {
-        "title": title,
-        "headings": headings,
-        "paragraphs": paragraphs,
-        "links": links,
-    }
+    return links

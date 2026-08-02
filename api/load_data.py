@@ -12,4 +12,9 @@ def main():
 
     text = page["title"] + " " + " ".join(page["paragraphs"])
 
-    add_page("page_1", text)
+    add_page(
+        "page_1",
+        text,
+        page["title"],
+        url
+    )

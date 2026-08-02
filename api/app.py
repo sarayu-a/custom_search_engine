@@ -26,5 +26,5 @@ def home():
 def search_api(q: str):
     return {
         "query": q,
-        "results": list(search(q))
+        "results": search(q)
     }

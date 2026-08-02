@@ -1,10 +1,11 @@
-import os
+from pathlib import Path
+
+DATA_DIRECTORY = Path("data")
 
 
 def save_page(filename, html):
-    os.makedirs("data", exist_ok=True)
+    DATA_DIRECTORY.mkdir(exist_ok=True)
 
-    path = os.path.join("data", filename)
+    file_path = DATA_DIRECTORY / filename
 
-    with open(path, "w", encoding="utf-8") as file:
-        file.write(html)
+    file_path.write_text(html, encoding="utf-8")
