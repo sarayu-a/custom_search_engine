@@ -1,11 +1,17 @@
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from api.load_data import main
+from fastapi.middleware.cors import CORSMiddleware
+
+from api.load_data import main as load_data
 from indexer.search import search
 
-main()
+load_data()
 
-app = FastAPI()
+app = FastAPI(
+    title="Custom Search Engine",
+    version="1.0.0",
+    description="A simple search engine built with Python and FastAPI.",
+)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,7 +24,8 @@ app.add_middleware(
 @app.get("/")
 def home():
     return {
-        "message": "Custom Search Engine API"
+        "message": "Custom Search Engine API",
+        "status": "running",
     }
 
 
@@ -26,5 +33,6 @@ def home():
 def search_api(q: str):
     return {
         "query": q,
-        "results": search(q)
+        "count": len(search(q)),
+        "results": search(q),
     }
