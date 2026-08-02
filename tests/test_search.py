@@ -16,6 +16,15 @@ add_page(
     """
 )
 
+add_page(
+    "page3",
+    """
+    Python and Java are both programming languages.
+    """
+)
+
 print(search("python"))
 print(search("java"))
+print(search("python programming"))
+print(search("python java"))
 print(search("javascript"))
