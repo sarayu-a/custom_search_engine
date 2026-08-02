@@ -1,19 +1,18 @@
 from indexer.index import InvertedIndex
 from indexer.tokenizer import tokenize
 
-index = InvertedIndex()
-
-documents = {}
+_index = InvertedIndex()
+_documents = {}
 
 
 def add_page(document_id, text, title="", url=""):
     words = tokenize(text)
-    index.add_document(document_id, words)
+    _index.add_document(document_id, words)
 
-    documents[document_id] = {
+    _documents[document_id] = {
         "title": title,
         "url": url,
-        "text": text
+        "text": text,
     }
 
 
@@ -26,23 +25,26 @@ def search(query):
     results = None
 
     for word in words:
-        docs = index.search(word)
+        matches = _index.search(word)
 
         if results is None:
-            results = docs
+            results = matches
         else:
-            results = results.intersection(docs)
+            results = results.intersection(matches)
 
     if not results:
         return []
 
-    output = []
+    return [
+        {
+            "id": document_id,
+            "title": _documents[document_id]["title"],
+            "url": _documents[document_id]["url"],
+        }
+        for document_id in sorted(results)
+    ]
 
-    for doc in results:
-        output.append({
-            "id": doc,
-            "title": documents[doc]["title"],
-            "url": documents[doc]["url"]
-        })
 
-    return output
+def clear():
+    _index.clear()
+    _documents.clear()
